@@ -6,19 +6,31 @@ import applyDiff from './applyDiff.js'
 
 import registry from './registry.js'
 
-import modelFactory from './model/model.js'
+import stateFactory from './model/model.js'
 
 registry.add('app', appView)
 registry.add('todos', todosView)
 registry.add('counter', counterView)
 registry.add('filters', filtersView)
 
-const model = modelFactory()
+const loadState = () => {
+  const serializedState = window
+    .localStorage
+    .getItem('state')
+
+  if (!serializedState) {
+    return
+  }
+
+  return JSON.parse(serializedState)
+}
+
+const state = stateFactory(loadState())
 
 const {
   addChangeListener,
   ...events
-} = model
+} = state
 
 const render = (state) => {
   window.requestAnimationFrame(() => {
@@ -34,3 +46,18 @@ const render = (state) => {
 }
 
 addChangeListener(render)
+
+addChangeListener(state => {
+  Promise.resolve().then(() => {
+    window
+      .localStorage
+      .setItem('state', JSON.stringify(state))
+  })
+})
+
+addChangeListener(state => {
+  console.log(
+    `Current State (${(new Date()).getTime()})`,
+    state
+  )
+})
