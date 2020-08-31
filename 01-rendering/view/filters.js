@@ -1,13 +1,20 @@
-export default (targetElement, { currentFilter }) => {
-  const newCounter = targetElement.cloneNode(true)
+export default (targetElement, { currentFilter }, { changeFilter }) => {
+  const newFilters = targetElement.cloneNode(true)
+
   Array
-    .from(newCounter.querySelectorAll('li a'))
+    .from(newFilters.querySelectorAll('li a'))
     .forEach(a => {
       if (a.textContent === currentFilter) {
         a.classList.add('selected')
       } else {
         a.classList.remove('selected')
       }
+
+      a.addEventListener('click', e => {
+        e.preventDefault()
+        changeFilter(a.textContent)
+      })
     })
-  return newCounter
+
+  return newFilters
 }
